@@ -1,0 +1,5 @@
+﻿  SR_server.cpp
+e:\计算网络\sr_server\sr_server\sr_server.cpp(109): warning C4101: “step”: 未引用的局部变量
+e:\计算网络\sr_server\sr_server\sr_server.cpp(169): warning C4244: “=”: 从“std::streamoff”转换到“long”，可能丢失数据
+e:\计算网络\sr_server\sr_server\sr_server.cpp(211): warning C4309: “=”: 截断常量值
+  SR_server.vcxproj -> E:\计算网络\SR_server\Debug\SR_server.exe

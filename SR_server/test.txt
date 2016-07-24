@@ -1,0 +1,734 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 07 22:53:00 2016
+
+@author: 87471
+"""
+import sqlite3
+import MySQLdb
+import time
+from Tkinter import *
+from FileDialog import *
+
+
+
+sql = sqlite3.connect('d:\\DATABASE.db')
+str=''
+str2=''
+stdf=0
+scf=0
+cf=0
+tf=0
+firstflag=0
+
+class mysqldb():
+    def __init__(self):
+        try:
+            self.conn=MySQLdb.connect(host='localhost',user ='root',passwd='874710492lgw',db = 'sct',charset='utf8',port =3306)
+   
+            self.cur=self.conn.cursor()
+            #self.cur.execute('create database if not exists sct')
+            
+        except MySQLdb.Error,e:
+            print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    def insert(self,strval):
+        self.__init__()
+        self.cur.execute(strval)
+        self.conn.commit()
+        self.cur.close()
+        return 0 
+    def search(self,strval):
+        self.__init__()
+        self.cur.execute(strval)
+        return self.cur.fetchall()
+        self.cur.close()
+    def update(self,strval):
+        self.__init__()
+        self.cur.execute(strval)
+        self.conn.commit()
+        self.cur.close()
+    def delete(self,strval):
+        self.__init__()
+        self.cur.execute(strval)
+        self.conn.commit()
+        self.cur.close()
+
+        
+
+'''
+class database():
+    def __init__(self):
+        self.cu=self.get_cursor(sql)
+    def get_cursor(self,sql):
+        if sql is not None:
+            return sql.cursor()
+    def insert(self,strval):
+        self.__init__()
+        self.cu.execute(strval)
+        sql.commit()
+        self.cu.close()
+        return 0
+    def search(self,strval):
+        self.__init__()
+
+        self.cu.execute(strval)
+        return self.cu.fetchall()
+        self.cu.close()
+'''
+class eventProcess():
+    def __init__(self):
+        self.root=Tk()
+        self.fr=Frame(self.root,width=200,height = 150).grid(row = 0 ,column = 0 ,rowspan = 6,columnspan = 9 , sticky = W+E+N+S)
+        self.fr1=Frame(width=200,height = 50, bg = 'RED').grid(row = 6, column = 0,rowspan = 3,columnspan = 9, sticky = W+E+N+S)
+        self.fr2=Frame(width=200,height = 150).grid(row = 9, column = 0,rowspan = 10,columnspan = 9, sticky = W+E+N+S)
+        self.var()
+        self.windowconfig()
+        
+        self.checkbt()
+        self.btenter()
+        
+        self.display()
+        #self.root.update()
+        #self.menu()
+        self.root.mainloop()
+       
+        
+    def var(self):
+        #student var
+        self.stdnum=IntVar()
+        self.tstdnum=StringVar()
+        self.stdname=IntVar()
+        self.tstdname=StringVar()
+        self.stdage=IntVar()
+        self.tstdage=StringVar()
+        self.stdsex=IntVar()
+        self.tstdsex=StringVar()
+        self.stdxi=IntVar()
+        self.tstdxi=StringVar()
+        self.stdclass=IntVar()
+        self.tstdclass=StringVar()
+        
+        #sc var
+        self.stdnum1=IntVar()
+        self.tstdnum1=StringVar()
+        self.stdmark=IntVar()
+        self.tstdmark=StringVar()
+        self.cnum=IntVar()
+        self.tcnum=StringVar()
+
+        #course var
+        self.cnum1=IntVar()
+        self.tcnum1=StringVar()
+        self.cname=IntVar()
+        self.tcname=StringVar()
+        self.chours=IntVar()
+        self.tchours=StringVar()
+        self.credit=IntVar()
+        self.tcredit=StringVar()
+        self.csemster=IntVar()
+        self.tcsemster=StringVar()
+        #teacher var
+        self.tnum=IntVar()
+        self.ttnum=StringVar()
+        self.tcname=IntVar()
+        self.ttcname=StringVar()
+        self.cnum2=IntVar()
+        self.tcnum2=StringVar()
+
+        ###
+        
+
+        #other
+        self.finaltext=''        
+        self.result=''
+        self.expression=''  
+        self.lst=[]   
+        self.cblst=[]   
+        self.entrylst=[]
+
+        self.lst1=['`s#`','`sname`','`sage`','`ssex`','`sclass`','`dname`','`s#`','`c#`','`score`','`c#`','`cname`','`chours`','`credit`','`csemster`','`t#`','`tname`','`c#`']
+        
+    def windowconfig(self):
+        self.root.title('数据库')
+        self.root.minsize(500,500)
+        #self.root.maxsize(500,500)
+        
+    def checkbt(self):
+        
+        #第一列 student
+        self.btstdnum=Checkbutton(self.fr,text='学号',variable = self.stdnum).grid(row=0,column=0)
+        self.entrystdnum=Entry(self.fr,textvariable =self.tstdnum).grid(row=0,column=1)
+        self.btstdname=Checkbutton(self.fr,text='姓名',variable = self.stdname).grid(row=1,column=0)
+        self.entryname=Entry(self.fr,textvariable =self.tstdname).grid(row=1,column=1)
+        self.btstdage=Checkbutton(self.fr,text='年龄',variable = self.stdage).grid(row=2,column=0)
+        self.entryage=Entry(self.fr,textvariable =self.tstdage).grid(row=2,column=1)
+        self.btstdsex=Checkbutton(self.fr,text='性别',variable = self.stdsex).grid(row=3,column=0)
+        self.entrysex=Entry(self.fr,textvariable =self.tstdsex).grid(row=3,column=1)
+        self.btstdclass=Checkbutton(self.fr,text='班级',variable = self.stdclass).grid(row=4,column=0)
+        self.entryclass=Entry(self.fr,textvariable =self.tstdclass).grid(row=4,column=1)
+        self.btstdxi=Checkbutton(self.fr,text='系名',variable = self.stdxi).grid(row=5,column=0)
+        self.entryxi=Entry(self.fr,textvariable =self.tstdxi).grid(row=5,column=1)
+        
+        #第二列 sc
+        self.btstdmark=Checkbutton(self.fr,text='成绩',variable = self.stdmark).grid(row=2,column=2)
+        self.entrymark=Entry(self.fr,textvariable =self.tstdmark).grid(row=2,column=3)
+        self.btstdaddr=Checkbutton(self.fr,text='课号',variable = self.cnum).grid(row=1,column=2)
+        self.entryaddr=Entry(self.fr,textvariable =self.tcnum).grid(row=1,column=3)
+        self.btstdnum=Checkbutton(self.fr,text='学号',variable = self.stdnum1).grid(row=0,column=2)
+        self.entrystdnum=Entry(self.fr,textvariable =self.tstdnum1).grid(row=0,column=3)
+
+        #第三列 course
+        self.bcnum1=Checkbutton(self.fr,text='课号',variable = self.cnum1).grid(row =0,column = 4)
+        self.entrycnum1=Entry(self.fr,textvariable = self.tcnum1).grid(row = 0,column = 5)
+        self.bcname=Checkbutton(self.fr,text='课程',variable = self.cname).grid(row =1,column = 4)
+        self.entrycname=Entry(self.fr,textvariable = self.tcname).grid(row = 1,column = 5)
+        self.bchours=Checkbutton(self.fr,text='学时',variable = self.chours).grid(row =2,column = 4)
+        self.entrychours=Entry(self.fr,textvariable = self.tchours).grid(row = 2,column = 5)
+        self.bcredit=Checkbutton(self.fr,text='学分',variable = self.credit).grid(row =3,column = 4)
+        self.entrycredit=Entry(self.fr,textvariable = self.tcredit).grid(row = 3,column = 5)
+        self.bcsemster=Checkbutton(self.fr,text='学期',variable = self.csemster).grid(row =4,column = 4)
+        self.entrycsemster=Entry(self.fr,textvariable = self.tcsemster).grid(row = 4,column = 5)
+
+        #第四列 teacher
+        self.btnum=Checkbutton(self.fr,text = '教师号',variable = self.tnum).grid(row = 0,column = 6)
+        self.entrytnum=Entry(self.fr,textvariable = self.ttnum).grid(row = 0,column = 7)
+        self.btcname=Checkbutton(self.fr,text = '教师名',variable = self.tcname).grid(row = 1,column = 6)
+        self.entrytcname=Entry(self.fr,textvariable = self.ttcname).grid(row = 1,column = 7)
+        self.bcnum2=Checkbutton(self.fr,text = '课程号',variable = self.cnum2).grid(row = 2,column = 6)
+        self.entrycnum2=Entry(self.fr,textvariable = self.tcnum2).grid(row = 2,column = 7)
+
+
+    def btenter(self):
+        
+        self.btenter=Button(self.fr,text='查询',command=\
+        self.searchsql).grid(row=0,column=8,columnspan = 1,sticky = W+E+N+S)
+        self.btinsert=Button(self.fr,text='插入',command=\
+        self.insert).grid(row=1,column=8,columnspan = 1,sticky = W+E+N+S)
+        self.btinsert=Button(self.fr,text='更新',command=\
+        self.update).grid(row=2,column=8,columnspan = 1,sticky = W+E+N+S)
+        self.btinsert=Button(self.fr,text='删除',command=\
+        self.delete).grid(row=3,column=8,columnspan = 1,sticky = W+E+N+S)
+        
+    def display(self):
+        #self.root.update()
+        self.display1=Label(self.fr1,bg='gray',wraplength=450\
+        ,justify='left',text=self.finaltext).grid(row = 6,column = 0,rowspan = 3,columnspan = 9,sticky = W+E+N+S)
+        #self.display1.grid(row=6,column=0,rowspan=3,columnspan=1025,sticky=W)
+        #self.display1.pack()
+        #self.display2=Label(self.root,bg='light blue',width=71,height=1,text=outputtext,\
+        #compound='left').grid(row=10,column=0,columnspan=35,sticky=S)
+        self.display3=Listbox(self.fr2,bg='#FFFFF0',width=71,height=30)
+        for i in self.result:
+            self.display3.insert(END,i)
+        list1=list(self.result)
+        self.display3.grid(row=11,column=0,columnspan=35,sticky=W+E+N+S)        
+        self.root.update()
+    '''
+    def search(self):
+        str1='select * from student where '
+        firstflag=0
+        if self.stdnum.get()==1 and len(self.tstdnum.get().strip())>0:
+            str1=str1+ "(stdnum like '" + self.tstdnum.get().strip()+"')"
+            firstflag=1
+        if self.stdname.get()==1 and len(self.tstdname.get().strip())>0:
+            if firstflag==1:  
+                str1=str1+ "and (sname like '" + self.tstdname.get().strip()+"')"
+            else :
+                str1=str1+ "(sname like '" + self.tstdname.get().strip()+"')"
+                firstflag=1
+        if self.stdsex.get()==1 and len(self.tstdsex.get().strip())>0:
+            if firstflag==1:
+                str1=str1+"and (ssex ='"+self.tstdsex.get().strip()+"')"
+            else :
+                str1=str1+"(ssex ='"+self.tstdsex.get().strip()+"')"
+                firstflag=1
+        if self.stdclass.get()==1 and len(self.tstdclass.get().strip())>0 :
+            if firstflag==1:
+                str1=str1+"and (sclass = "+self.tstdclass.get().strip()+")"
+            else:
+                str1=str1+"(sclass = "+self.tstdclass.get().strip()+")"
+                firstflag=1
+        if self.stdxi.get()==1 and len(self.tstdxi.get().strip())>0:
+            if firstflag==1:
+                str1=str1+"and (Dnum ="+self.tstdxi.get().strip()+")"
+            else:
+                str1=str1+"(Dnum ="+self.tstdxi.get().strip()+")"
+                firstflag=1
+        if self.stdmark.get()==1 and len(self.tstdmark.get().strip())>0:
+            if firstflag==1:
+                str1=str1+"and (saddr ='"+self.tstdmark.get().strip()+"')"
+            else:
+                str1=str1+"(saddr ='"+self.tstdmark.get().strip()+"')"
+                firstflag=1
+        if self.stdage.get()==1 and self.tstdage.get()<=self.tstdage1.get():
+            if firstflag==1:
+                str1=str1+"and (sage>= "+str(self.tstdage.get())+")"+"and (sage<="\
+                +str(self.tstdage1.get())+")"
+            else:
+                str1=str1+"(sage>= "+str(self.tstdage.get())+")"+"and (sage<="\
+                +str(self.tstdage1.get())+")"
+                firstflag=1
+        if firstflag==0:
+            str1='select * from student'
+        
+        a=database()
+        self.finaltext= str1
+        
+        self.result= a.search(str1)
+        self.display() '''
+        
+    def searchsql(self):
+        
+        a =self.generate()
+        if a!=0:       
+            self.finaltext= self.expression
+            mysql=mysqldb()
+            self.result=mysql.search(self.expression)
+            self.display()
+            return 1 
+        else :
+            self.finaltext='ERROR you must select something to display'
+            self.result=''
+            self.display()
+            return 0
+    def insert(self):
+        self.finaltext=''
+        self.generate()
+        ff=0
+        mysql=mysqldb()
+        #student
+        str2='insert into student ('
+        for i in range (6):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+=self.lst1[i]
+                    ff=1
+                else :
+                    str2+=','
+                    str2+=self.lst1[i]
+        if ff==0:
+            self.finaltext='ERROR'
+            return 0
+        ff=0
+        str2+=') values('
+        for i in range (6):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+                    ff=1
+                else :
+                    str2+=','
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+        str2+=')'
+        self.finaltext=str2
+        #self.display()
+        #time.sleep(2)
+        #sc
+        str2='insert into sc ('
+        for i in range (6,9):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+=self.lst1[i]
+                    ff=1
+                else :
+                    str2+=','
+                    str2+=self.lst1[i]
+        if ff==0:
+            self.finaltext='ERROR'
+            return 0
+        ff=0
+        str2+=') values('
+        for i in range (6,9):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+                    ff=1
+                else :
+                    str2+=','
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+        str2+=')'
+        self.finaltext=str2
+        #self.display()
+        #time.sleep(2)
+        #course
+        str2='insert into course ('
+        for i in range (9,14):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+=self.lst1[i]
+                    ff=1
+                else :
+                    str2+=','
+                    str2+=self.lst1[i]
+        if ff==0:
+            self.finaltext='ERROR'
+            return 0
+        ff=0
+        str2+=') values('
+        for i in range (9,14):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+                    ff=1
+                else :
+                    str2+=','
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+        str2+=')'
+        self.finaltext=str2
+        #self.display()
+        #time.sleep(2)
+        #teacher
+        str2='insert into teacher ('
+        for i in range (14,17):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+=self.lst1[i]
+                    ff=1
+                else :
+                    str2+=','
+                    str2+=self.lst1[i]
+        if ff==0:
+            self.finaltext='ERROR'
+            return 0
+        ff=0
+        str2+=') values('
+        for i in range (14,17):
+            if self.entrylst[i]!='' and self.entrylst[i]!=0:
+                if ff==0:
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+                    ff=1
+                else :
+                    str2+=','
+                    str2+="'"
+                    str2+=self.entrylst[i]
+                    str2+="'"
+        str2+=')'
+        self.finaltext=str2
+        #self.display()
+        #time.sleep(2)
+
+        self.finaltext=str2
+        self.display()
+
+        '''
+        str2='insert into student values('+str(self.tstdnum.get())+','+"'"+self.tstdname.get()+"'"+','\
+        +str(self.tstdage.get())+','+"'"+self.tstdsex.get()+"'"+','+str(self.tstdclass.get())+','\
+        +str(self.tstdxi.get())+','+"'"+self.tstdaddr.get()+"'"+')'
+        b=database()
+        self.finaltext= str2
+        if len(self.tstdnum.get().strip())>0 and  len(self.tstdname.get().strip())>0 and \
+        len(self.tstdsex.get().strip())>0 and len(self.tstdclass.get().strip())>0 and \
+        len(self.tstdxi.get().strip())>0 and len(self.tstdaddr.get().strip())>0 and \
+        len(self.tstdage.get())>0:  
+            b.insert(str2)
+        else:
+            self.finaltext= 'ERROR '
+        self.display()
+        '''
+    def update(self):
+        return 0
+    def delete(self):
+        return 0
+
+    def filedia(self):
+        Fd=LoadFileDialog(self.root)
+    def generate(self):
+        self.expression='Select  '
+        self.cblst=[]
+        stdf=0
+        scf=0
+        cf=0
+        tf=0
+        firstflag=0
+        #student checkButton
+        if (self.stdnum.get()==1):
+            self.expression=self.expression+"`student`.`s#`"
+            firstflag=1
+            stdf=1
+            self.cblst.append(1)
+        else :
+            self.cblst.append(0)
+       
+        if self.stdname.get()==1:
+            stdf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`student`.`sname`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`student`.`sname`"
+        else :
+            self.cblst.append(0)
+        if self.stdage.get()==1:
+            stdf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`student`.`sage`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`student`.`sage`"
+
+        else :
+            self.cblst.append(0)
+        if self.stdsex.get()==1:
+            stdf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`student`.`ssex`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`student`.`ssex`"
+        else :
+            self.cblst.append(0)
+        if self.stdclass.get()==1:
+            stdf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`student`.`sclass`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`student`.`sclass`"
+        else :
+            self.cblst.append(0)
+        if self.stdxi.get()==1:
+            stdf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`student`.`dname`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`student`.`dname`"
+        else :
+            self.cblst.append(0)
+        
+        #sc CheckButton
+
+        if self.stdnum1.get()==1:
+            scf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`sc`.`s#`"
+                firstflag=1
+            else:
+                self.expression=self.expression+",`sc`.`s#`"
+        else :
+            self.cblst.append(0)
+        if self.cnum.get()==1:
+            scf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`sc`.`c#`"
+                firstflag=1
+            else:
+                self.expression=self.expression+",`sc`.`c#`"
+        else :
+            self.cblst.append(0)
+        if self.stdmark.get()==1:
+            scf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`sc`.`score`"
+                firstflag=1
+            else:
+                self.expression=self.expression+",`sc`.`score`"
+        else :
+            self.cblst.append(0)
+
+
+        #course CB
+        if self.cnum1.get()==1:
+            cf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`course`.`c#`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`course`.`c#`"
+        else :
+            self.cblst.append(0)
+        if self.cname.get()==1:
+            cf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`course`.`cname`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`course`.`cname`"
+        else :
+            self.cblst.append(0)
+        if self.chours.get()==1:
+            cf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`course`.`chours`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`course`.`chours`"
+        else :
+            self.cblst.append(0)
+        if self.credit.get()==1:
+            cf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`course`.`credit`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`course`.`credit`"
+        else :
+            self.cblst.append(0)
+        if self.csemster.get()==1:
+            cf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`course`.`csemster`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`course`.`csemster`"
+        else :
+            self.cblst.append(0)
+        
+        #teacher CB
+        if self.tnum.get()==1:
+            tf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`teacher`.`t#`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`teacher`.`t#`"
+        else :
+            self.cblst.append(0)
+        if self.tcname.get()==1:
+            tf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`teacher`.`tname`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`teacher`.`tname`"
+        else :
+            self.cblst.append(0)
+        if self.cnum2.get()==1:
+            tf=1
+            self.cblst.append(1)
+            if firstflag==0:
+                self.expression=self.expression+"`teacher`.`c#`"
+                firstflag=1
+            else :
+                self.expression=self.expression+",`teacher`.`c#`"
+        else :
+            self.cblst.append(0)
+        print self.cblst
+        self.expression=self.expression+" From "
+        self.lst=[]
+        str=''
+        self.lst.extend([stdf,scf,cf,tf])
+        self.entrylst=[]
+        self.entrylst.append(self.tstdnum.get())
+        self.entrylst.append(self.tstdname.get())
+        self.entrylst.append(self.tstdage.get())
+        self.entrylst.append(self.tstdsex.get())
+        self.entrylst.append(self.tstdclass.get())
+        self.entrylst.append(self.tstdxi.get())
+        self.entrylst.append(self.tstdnum1.get())
+        self.entrylst.append(self.tcnum.get())
+        self.entrylst.append(self.tstdmark.get())
+        self.entrylst.append(self.tcnum1.get())
+        self.entrylst.append(self.tcname.get())
+        self.entrylst.append(self.tchours.get())
+        self.entrylst.append(self.tcredit.get())
+        self.entrylst.append(self.tcsemster.get())
+        self.entrylst.append(self.ttnum.get())
+        self.entrylst.append(self.ttcname.get())
+        self.entrylst.append(self.tcnum2.get())
+        print self.entrylst
+        #print self.lst
+        for i in range(4):
+            if self.lst[i]==1:
+                str+="1"
+            else :
+                str+='0'
+        
+        if str=='0000':
+            return 0
+        else :
+            if str=='1000':
+                self.expression+="`student`"
+            if str=='1001' or str =='1101':
+                self.expression+='`student`,`teacher`,`sc` Where `student`.`s#`=`sc`.`s#` and `teacher`.`c#`=`sc`.`c#`'
+            if str=='1011' or str=='1111':
+                self.expression+='`student`,`course`,`sc`,`teacher` Where `student`.`s#`=`sc`.`s#` and `teacher`.`c#`=`sc`.`c#` and `sc`.`c#`=`teacher`.`c#`'
+            if str=='1010' or str == '1110':
+                self.expression+='`student`,`sc`,`course`  Where `student`.`s#`=`sc`.`s#` and `sc`.`c#`=`course`.`c#`'
+            if str=='1100':
+                self.expression+='`student`,`sc` Where `student`.`s#`=`sc`.`s#` '
+            if str=='0100':
+                self.expression+='`sc`'
+            if str=='0101':
+                self.expression+='`sc`,`teacher` Where `teacher`.`c#`=`sc`.`c#`'
+            if str=='0110':
+                self.expression+='`sc`,`course` Where `sc`.`c#`=`course`.`c#`'
+            if str=='0111':
+                self.expression+='`sc`,`course`,`teacher` Where `sc`.`c#`=`course`.`c#` and `teacher`.`c#`=`sc`.`c#`'
+            if str=='0001':
+                self.expression+='`teacher`'
+            if str=='0010':
+                self.expression+='`course`'
+            if str=='0011':
+                self.expression+='`course`,`teacher` Where `teacher`.`c#`=`course`.`c#`'
+        #print self.expression
+        
+        
+        return 1
+
+        
+
+    '''
+    def menu(self):
+        menubar = Menu(self.root)
+        #创建下拉菜单File，然后将其加入到顶级的菜单栏中
+        filemenu = Menu(menubar,tearoff=0)
+        filemenu.add_command(label="Open", command=self.filedia)
+        filemenu.add_command(label="Save", command=self.hello)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.quitt)
+        menubar.add_cascade(label="File", menu=filemenu)
+
+        #创建另一个下拉菜单Edit
+        editmenu = Menu(menubar, tearoff=0)
+        editmenu.add_command(label="Cut", command=self.hello)
+        editmenu.add_command(label="Copy", command=self.hello)
+        editmenu.add_command(label="Paste", command=self.hello)
+        menubar.add_cascade(label="Edit",menu=editmenu)
+        #创建下拉菜单Help
+        helpmenu = Menu(menubar, tearoff=0)
+        helpmenu.add_command(label="About", command=self.about)
+        menubar.add_cascade(label="Help", menu=helpmenu)
+
+        #显示菜单
+        self.root.config(menu=menubar)
+        
+    def quitt(self):
+        self.root.destroy()
+        
+    def hello(self):
+        print('hello')
+
+    def about(self):
+        print('hello')
+        '''
+eventProcess()
